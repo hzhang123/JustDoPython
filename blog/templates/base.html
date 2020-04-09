@@ -1,35 +1,58 @@
+{#自己编写一个基类模板#}
+{% from 'bootstrap/nav.html' import render_nav_item %}
+{% from 'bootstrap/utils.html' import render_messages %}
+{% from 'bootstrap/utils.html' import render_static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% if title %}
         <title>{{ title }} - 博客</title>
     {% else %}
         <title>欢迎来到博客！</title>
     {% endif %}
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{#    {{ bootstrap.load_css() }}#}
+    {{ render_static('css',
+    'https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/spacelab/bootstrap.min.css',
+            local = Flase) }}
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            {{ render_nav_item('index', '首页', use_li=True) }}
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            {% if current_user.is_anonymous %}
+                {{ render_nav_item('login', '登录', use_li=True) }}
+                {{ render_nav_item('register', '注册', use_li=True) }}
+            {% else %}
+                {{ render_nav_item('user', current_user.username, use_li=True, username=current_user.username) }}
+                {{ render_nav_item('logout', '注销', use_li=True) }}
+            {% endif %}
+        </ul>
+    </div>
+</nav>
 
-{# 顶部链接 #}
-<div>
-    博客：
-    <a href="{{ url_for('index') }}">首页</a>
-    <a href="{{ url_for('login') }}">登录</a>
-</div>
-<hr>
+<main class="container">
+    {{ render_messages(container=False, dismissible=True) }}
+    {% block content %}{% endblock %}
+</main>
 
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ur>
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ur>
-    {% endif %}
-{% endwith %}
+<footer class="text-center">
+    {% block footer %}
+        <small> &copy; 2018 <a href="http://greyli.com" title="Written by hzhang">hzhang</a>
+        </small>
+    {% endblock %}
+</footer>
 
-{% block content %}
-{% endblock %}
-
+{{ bootstrap.load_js() }}
 </body>
 </html>

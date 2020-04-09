@@ -10,3 +10,5 @@
 
 class Config(object):
     SECRET_KEY = 'hzhang123'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://hzhang:123456@192.168.2.101:5432/stars'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

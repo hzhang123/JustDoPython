@@ -1,25 +1,22 @@
 {% extends 'base.html' %}
+{% from 'bootstrap/form.html' import render_form %}
+{% from 'bootstrap/form.html' import render_field %}
 
 {% block content %}
-    <h1>登录</h1>
-    <form action="" , method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-                <span style="color: red">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
-            {% for error in form.password.errors %}
-                <span style="color: red">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+    <div style="margin: 100px">
+        <h3>登录</h3>
+        <form method="post">
+            {{ form.csrf_token() }}
+            {{ render_field(form.username) }}
+            {{ render_field(form.password) }}
+            {{ render_field(form.remember_me) }}
+            <p>还没注册？<a href="{{ url_for('register') }}">跳转注册页面</a></p>
+            {{ render_field(form.submit) }}
+        </form>
+{#        <div>#}
+{#            {{ render_form(form, button_map={'submit': 'success'}) }}#}
+{#        </div>#}
+
+    </div>
+
 {% endblock %}
