@@ -43,3 +43,15 @@ class EditProfileForm(FlaskForm):
     username = StringField('用户名', validators=[DataRequired(message='请输入用户名')])
     about_me = TextAreaField('关于我', validators=[Length(min=0, max=140)])
     submit = SubmitField('提交')
+
+
+class SchedulerTaskForm(FlaskForm):
+    name = StringField('任务名', validators=[DataRequired(message='请输入用户名')])
+    team = StringField('开发组', validators=[DataRequired(message='请输入用户名')])
+    service = StringField('所属服务', validators=[DataRequired(message='请输入用户名')])
+    url = StringField('URL', validators=[DataRequired(message='请输入用户名')])
+    method = StringField('请求方法', validators=[DataRequired(message='请输入用户名')])
+    body = TextAreaField('body', validators=[DataRequired(message='请输入用户名')])
+    assertion = StringField('断言方法', validators=[DataRequired(message='请输入用户名')])
+    expected = TextAreaField('预期结果', validators=[DataRequired(message='请输入用户名')])
+    submit = SubmitField('添加任务')

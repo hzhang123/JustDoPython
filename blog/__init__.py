@@ -7,6 +7,7 @@
 @CreateTime     :  2020/3/20 11:25
 ------------------------------------
 """
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 
 # 导入配置文件
@@ -26,6 +27,8 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 # 绑定app和数据库
 migrate = Migrate(app, db)
+# 引入定时任务管理
+scheduler = BackgroundScheduler()
 
 # 登录模块初始化
 login = LoginManager(app)

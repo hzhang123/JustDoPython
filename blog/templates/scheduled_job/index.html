@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <a href="{{ url_for('scheduler_task.add') }}">
+        <button id="bt_add_task" class="btn btn-danger">添加任务</button>
+    </a>
+    <button id="bt_remove" class="btn btn-danger" disabled>
+        <i class="glyphicon glyphicon-remove"></i> 删除任务
+    </button>
+    <button id="bt_refresh_task" class="btn btn-danger">重启进程</button>
+
+    <div class="container-fluid row">
+        <table id="tb_scheduled_tasks"></table>
+    </div>
+
+    <script>
+        $table = $('#tb_scheduled_tasks')
+        $bt_refresh_task = $('#bt_refresh_task')
+        $bt_remove = $('#bt_remove')
+
+        function getIdSelections() {
+            return $.map($table.bootstrapTable('getSelections'), function (row) {
+                console.log(row)
+                return row.id
+            })
+        }
+
+        window.operateEvents = {
+            'click .like': function (e, value, row, index) {
+                alert('You click like action, row: ' + JSON.stringify(row))
+            },
+            'click .remove': function (e, value, row, index) {
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: [row.id]
+                })
+            }
+        }
+
+        function initTable() {
+            $table.bootstrapTable({
+                url: '/scheduler/tasks',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                {#queryParams: oTableInit.queryParams,//传递参数（*）#}
+                sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                {#minimumCountColumns: 2,             //最少允许的列数#}
+                clickToSelect: true,                //是否启用点击选中行
+                {#height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度#}
+                {#uniqueId: "ID",                     //每一行的唯一标识，一般为主键列#}
+                showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [{
+                    checkbox: true
+                }, {
+                    field: 'id',
+                    title: 'id'
+                }, {
+                    field: 'name',
+                    title: '任务名称'
+                }, {
+                    field: 'team',
+                    title: '开发团队'
+                }, {
+                    field: 'service',
+                    title: '所属服务'
+                }, {
+                    field: 'method',
+                    title: '请求方法'
+                }, {
+                    field: 'url',
+                    title: 'url'
+                }, {
+                    field: 'body',
+                    title: '参数'
+                }, {
+                    field: 'assertion',
+                    title: '断言方法'
+                }, {
+                    field: 'expected',
+                    title: '预期结果'
+                }, {
+                    field: 'status',
+                    title: '状态'
+                },
+                ]
+            })
+            $table.on('check.bs.table uncheck.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table',
+                function () {
+                    $bt_remove.prop('disabled', !$table.bootstrapTable('getSelections').length)
+                    selections = getIdSelections()
+                })
+            $table.on('all.bs.table', function (e, name, args) {
+                console.log(name, args)
+            })
+            $bt_refresh_task.click(function () {
+                refresh_jobs()
+            })
+
+        }
+
+        $bt_remove.click(function () {
+            var ids = getIdSelections()
+            {#rows.param.join(#}
+            {#    {#}
+            {#        'key': 'vales'#}
+            {#    }#}
+            {#)#}
+            remove_jobs(ids)
+            $table.bootstrapTable('remove', {
+                field: 'id',
+                values: ids
+            })
+            $bt_remove.prop('disabled', true)
+        })
+
+        function remove_jobs(ids) {
+            let data = null
+            $.ajax({
+                url: '/scheduler/task/remove',
+                type: 'post',
+                contentType: "application/json",
+                data: JSON.stringify(ids),
+                dataType: 'JSON',
+                success: function (result) {
+                    data = result
+                }
+            })
+            return data
+        }
+
+        function refresh_jobs() {
+            let data = null
+            $.ajax({
+                url: '/scheduler/refresh',
+                type: 'get',
+                success: function (result) {
+                    data = result
+                }
+            });
+            return data
+        }
+
+        $(function () {
+            initTable()
+            $('#locale').change(initTable)
+        })
+
+
+    </script>
+{% endblock %}

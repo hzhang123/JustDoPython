@@ -1,0 +1,26 @@
+# !/usr/bin/python3
+# -*- coding: utf-8 -*-
+"""
+@Author         :  hzhang
+------------------------------------
+@File           :  protocol.py
+@CreateTime     :  2020/4/16 12:25
+------------------------------------
+"""
+import msgpack
+
+
+class Message(object):
+    def __init__(self, message_type, data, node_id):
+        self.type = message_type
+        self.data = data
+        self.node_id = node_id
+
+    def serialize(self):
+        return msgpack.dumps((self.type, self.data, self.node_id))
+
+    @classmethod
+    def unserialize(cls, data):
+        msg = cls(*msgpack.loads(data))
+        # msg = cls(*msgpack.loads(data, encoding='utf-8'))
+        return msg

@@ -9,15 +9,24 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% if title %}
-        <title>{{ title }} - 博客</title>
+        <title>{{ title }} - 测试平台</title>
     {% else %}
-        <title>欢迎来到博客！</title>
+        <title>欢迎来到测试平台！</title>
     {% endif %}
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-{#    {{ bootstrap.load_css() }}#}
-    {{ render_static('css',
-    'https://stackpath.bootstrapcdn.com/bootswatch/4.4.1/spacelab/bootstrap.min.css',
-            local = Flase) }}
+
+    {{ render_static('js', '/js/jquery.min.js', local = True) }}
+    {{ render_static('js', '/js/popper.min.js', local = True) }}
+
+    {{ render_static('js', '/js/bootstrap.min.js', local = True) }}
+    {{ render_static('css', '/css/bootstrap.min.css', local = True) }}
+
+    {{ render_static('css', '/css/bootstrap-table.min.css', local = True) }}
+    {{ render_static('js', '/js/bootstrap-table.min.js', local = True) }}
+    {{ render_static('js', '/js/bootstrap-table-zh-CN.min.js', local = True) }}
+
+
+
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
@@ -28,6 +37,12 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             {{ render_nav_item('index', '首页', use_li=True) }}
+            {% if current_user.is_anonymous %}
+
+            {% else %}
+                {{ render_nav_item('locust_hive.index', 'locust调度', use_li=True) }}
+                {{ render_nav_item('scheduler_task.index', '任务列表', use_li=True) }}
+            {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">
             {% if current_user.is_anonymous %}
@@ -48,7 +63,7 @@
 
 <footer class="text-center">
     {% block footer %}
-        <small> &copy; 2018 <a href="http://greyli.com" title="Written by hzhang">hzhang</a>
+        <small> &copy; 2018 <a href="https://www.cnblogs.com/h-zhang/" title="Written by hzhang">hzhang</a>
         </small>
     {% endblock %}
 </footer>

@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package io.growing.segmentation.grpc.v1;
+
+import "google/protobuf/wrappers.proto";
+
+option java_package = "io.growing.segmentation.grpc.v1";
+
+service SegService {
+    rpc GetSegCountByProjects(SegCountRequest) returns (SegCountReply) {}
+//    rpc GetSegsProject(SegRequest) returns (SegReply) {}
+    rpc BatchCreateSeg(BatchCreateSegRequest) returns (BatchSegReply) {}
+    rpc BatchUpdateSegId(BatchUpdateSegIdRequest) returns (BatchSegReply) {}
+    rpc CreateSegmentExportJob(CreateSegmentExportJobRequest) returns (CreateSegmentExportJobReply){}
+}
+
+message SegCountRequest {
+    repeated int64 project_id = 1;
+}
+
+message SegCountReply {
+    int32 count = 1;
+}
+
+message BatchCreateSegRequest {
+    int64 project_id = 1;
+    string ai = 2;
+    int64 creator_id = 3;
+    repeated CreateSegForm create_seg_form = 4;
+}
+
+message BatchSegReply {
+    repeated string reply_message = 1;
+}
+
+message CreateSegForm {
+    string mode = 1;
+    SegmentationFormV3 segmentation_form_v3 = 2;
+    FrequencySegmentationGenerateForm frequency_segmentation_generate_form = 3;
+    FunnelSegmentationGenerateForm funnel_segmentation_generate_form = 4;
+}
+
+message SegmentationFormV3 {
+    int64 id = 1;
+    string name = 2;
+    string comment = 3;
+    string user_scope = 4;
+    string condition_expr = 5;
+    repeated SegmentationCondition conditions = 6;
+}
+
+message SegmentationCondition {
+    string type = 1;
+    string alias = 2;
+    bool flag = 3;
+    string id = 4;
+    string action = 5;
+    string measurement_type = 6;
+    string range = 7;
+    string op = 8;
+    repeated string values = 9;
+    string doc_id = 10;
+    string dim_filters_op = 11;
+    repeated DimFilter dim_filters = 12;
+    string aggregator = 13;
+    string name = 14;
+    string file_name = 15;
+    string attribute = 16;
+    string value_type = 17;
+}
+
+message DimFilter {
+    string dim = 1;
+    string op = 2;
+    repeated string values = 3;
+    string file_name = 4;
+    string name = 5;
+}
+
+message FrequencySegmentationGenerateForm {
+    int64 id = 1;
+    string name = 2;
+    string req = 3;
+    double upper_bound = 4;
+    double lower_bound = 5;
+    string dimension_value = 6;
+}
+
+
+message FunnelSegmentationGenerateForm {
+    int64 id = 1;
+    string name = 2;
+    bool remain = 3;
+    int32 position = 4;
+    string req = 5;
+}
+
+message BatchUpdateSegIdRequest {
+    int64 project_id = 1;
+    int64 updater_id = 3;
+    repeated IdMap id_map = 4;
+}
+
+message IdMap {
+    int64 old_id = 1;
+    int64 new_id = 2;
+}
+
+message CreateSegmentExportJobRequest{
+    int64 id = 1;
+    int64 project_id = 2;
+    google.protobuf.Int32Value expire = 3;
+    repeated string parameters = 4;
+}
+
+message CreateSegmentExportJobReply{
+    string id = 1;
+    string status = 2;
+    repeated string files = 5;
+    string error = 3;
+}

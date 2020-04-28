@@ -1,6 +1,5 @@
-# 青菜
-# 黄瓜
-# 西红柿
+# !/usr/bin/python3
+# -*- coding: utf-8 -*-
 from datetime import datetime
 
 from flask import render_template, flash, redirect, url_for, request
@@ -9,7 +8,12 @@ from werkzeug.urls import url_parse
 
 from blog import app, db
 from blog.forms import LoginForm, RegistrationForm, EditProfileForm
+from blog.locusts import locust_hive
 from blog.models import User
+from blog.scheduler_task import scheduler_task
+
+app.register_blueprint(locust_hive, url_prefix='/locusts')
+app.register_blueprint(scheduler_task, url_prefix='/scheduler')
 
 
 @app.route('/')
@@ -29,6 +33,21 @@ def index():
         }
     ]
     return render_template('index.html', title='我的', user=user, posts=posts)
+
+
+@app.route('/get_script', methods=['GET', 'POST'])
+def get_script():
+    data = [
+        {
+            "url": 'https://gta.growingio.com/_private/v3/projects/j9y6DDrR/charts',
+            "method": 'GET'
+        }, {
+            "url": 'https://gta.growingio.com/_private/v3/projects/j9y6DDrR/dashboards?type=normal',
+            "method": 'POST'
+        }
+    ]
+    print(render_template('scheduled_job/jobs.html', rows=data))
+    return render_template('scheduled_job/jobs.html', rows=data)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -82,8 +101,8 @@ def register():
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = [
-        {'author':user,'body':'测试Post #1号'},
-        {'author':user,'body':'测试Post #2号'}
+        {'author': user, 'body': '测试Post #1号'},
+        {'author': user, 'body': '测试Post #2号'}
     ]
     return render_template('user.html', user=user, posts=posts)
 
