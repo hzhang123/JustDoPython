@@ -55,3 +55,11 @@ class SchedulerTaskForm(FlaskForm):
     assertion = StringField('断言方法', validators=[DataRequired(message='请输入用户名')])
     expected = TextAreaField('预期结果', validators=[DataRequired(message='请输入用户名')])
     submit = SubmitField('添加任务')
+
+
+class TestCasesForm(FlaskForm):
+    name = StringField('任务名', validators=[DataRequired(message='请输入用户名')])
+    team = StringField('开发组', validators=[DataRequired(message='请输入用户名')])
+    service = StringField('所属服务', validators=[DataRequired(message='请输入用户名')])
+    case_json = TextAreaField('用例Json', validators=[DataRequired(message='请输入用户名')])
+    submit = SubmitField('添加任务')

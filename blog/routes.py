@@ -7,13 +7,13 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from blog import app, db
+from blog.cases import cases_blueprint
 from blog.forms import LoginForm, RegistrationForm, EditProfileForm
-from blog.locusts import locust_hive
 from blog.models import User
-from blog.scheduler_task import scheduler_task
 
-app.register_blueprint(locust_hive, url_prefix='/locusts')
-app.register_blueprint(scheduler_task, url_prefix='/scheduler')
+# app.register_blueprint(locust_hive, url_prefix='/locusts')
+# app.register_blueprint(scheduler_task, url_prefix='/scheduler')
+app.register_blueprint(cases_blueprint, url_prefix='/case')
 
 
 @app.route('/')
@@ -21,7 +21,6 @@ app.register_blueprint(scheduler_task, url_prefix='/scheduler')
 @login_required
 def index():
     user = {'username': 'zhanghao'}
-
     posts = [
         {
             'author': {'username': '张三'},
@@ -33,21 +32,6 @@ def index():
         }
     ]
     return render_template('index.html', title='我的', user=user, posts=posts)
-
-
-@app.route('/get_script', methods=['GET', 'POST'])
-def get_script():
-    data = [
-        {
-            "url": 'https://gta.growingio.com/_private/v3/projects/j9y6DDrR/charts',
-            "method": 'GET'
-        }, {
-            "url": 'https://gta.growingio.com/_private/v3/projects/j9y6DDrR/dashboards?type=normal',
-            "method": 'POST'
-        }
-    ]
-    print(render_template('scheduled_job/jobs.html', rows=data))
-    return render_template('scheduled_job/jobs.html', rows=data)
 
 
 @app.route('/login', methods=['GET', 'POST'])

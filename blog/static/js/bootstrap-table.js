@@ -2912,7 +2912,7 @@
 	    }
 	  },
 	  4: {
-	    iconsPrefix: 'fa',
+	    iconsPrefix: 'fas',
 	    icons: {
 	      paginationSwitchDown: 'fa-caret-square-down',
 	      paginationSwitchUp: 'fa-caret-square-up',

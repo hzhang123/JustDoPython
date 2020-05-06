@@ -21,11 +21,18 @@
     {{ render_static('js', '/js/bootstrap.min.js', local = True) }}
     {{ render_static('css', '/css/bootstrap.min.css', local = True) }}
 
-    {{ render_static('css', '/css/bootstrap-table.min.css', local = True) }}
-    {{ render_static('js', '/js/bootstrap-table.min.js', local = True) }}
+    {{ render_static('css', '/css/bootstrap-table.css', local = True) }}
+    {{ render_static('js', '/js/bootstrap-table.js', local = True) }}
     {{ render_static('js', '/js/bootstrap-table-zh-CN.min.js', local = True) }}
-
-
+    <!-- jsonedit -->
+    {{ render_static('js', 'https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js', local = False) }}
+    {{ render_static('css', 'https://cdn.bootcdn.net/ajax/libs/jsoneditor/8.6.6/jsoneditor.min.css', local = False) }}
+    {{ render_static('js', 'https://cdn.bootcdn.net/ajax/libs/jsoneditor/8.6.6/jsoneditor.min.js', local = False) }}
+    <!-- fas -->
+    {{ render_static('css', '/fontawesome-free-5.13.0-web/css/all.css', local = True) }}
+    <!-- fileinput -->
+    {{ render_static('js', 'https://cdn.bootcdn.net/ajax/libs/bootstrap-fileinput/5.0.8/js/fileinput.min.js', local = False) }}
+    {{ render_static('css', 'https://cdn.bootcdn.net/ajax/libs/bootstrap-fileinput/5.0.8/css/fileinput.min.css', local = False) }}
 
 </head>
 <body>
@@ -40,8 +47,9 @@
             {% if current_user.is_anonymous %}
 
             {% else %}
-                {{ render_nav_item('locust_hive.index', 'locust调度', use_li=True) }}
-                {{ render_nav_item('scheduler_task.index', '任务列表', use_li=True) }}
+                {#                {{ render_nav_item('locust_hive.index', 'locust调度', use_li=True) }}#}
+                {#                {{ render_nav_item('scheduler_task.index', '任务列表', use_li=True) }}#}
+                {{ render_nav_item('cases.index', '测试用例', use_li=True) }}
             {% endif %}
         </ul>
         <ul class="nav navbar-nav navbar-right">

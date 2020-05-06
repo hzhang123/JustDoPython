@@ -74,7 +74,27 @@ class SchedulerHttpTask(db.Model):
         fields = self.__dict__
         if "_sa_instance_state" in fields:
             del fields["_sa_instance_state"]
+        return fields
 
+
+class TestCases(db.Model):
+    __tablename__ = 'test_cases'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    team = db.Column(db.String(128))
+    service = db.Column(db.String(128))
+    trigger = db.Column(db.JSON)
+    case_json = db.Column(db.JSON)
+    status = db.Column(db.String(128))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_json(self):
+        fields = self.__dict__
+        if "_sa_instance_state" in fields:
+            del fields["_sa_instance_state"]
         return fields
 
 

@@ -39,7 +39,7 @@ class CreateSegmentExportJobGrpc(object):
     """
 
     def __init__(self):
-        self.name = 'CreateSegmentExportJobGrpc'
+        self.name = 'RequestM'
 
     def post(self, host, port, data):
         # 开始时间

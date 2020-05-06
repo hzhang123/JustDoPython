@@ -1,0 +1,418 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".test-case-add-modal"><i
+            class="fa fa-plus-square" aria-hidden="true"></i> 测试用例
+    </button>
+
+    <div class="modal fade test-case-add-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">添加用例</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+{#                    <input id="input-700" name="kartik-input-700" type="file" multiple class="file-loading" data-show-preview="false">#}
+                    <label for="in-name-create" class="col-form-label">用例名称:</label>
+                    <input id="in-name-create" type="text" class="form-control" placeholder="请输入用例名称，如：查询全部用例">
+                    <label for="in-team-create" class="col-form-label">开发组:</label>
+                    <input id="in-team-create" type="text" class="form-control" placeholder="请输入开发组，如：测试组">
+                    <label for="in-service-create" class="col-form-label">服务名称:</label>
+                    <input id="in-service-create" type="text" class="form-control" placeholder="请输入所属微服务，如：test-stars">
+                    <label for="jsoneditor-create" class="col-form-label">用例内容:</label>
+
+                    <div id="jsoneditor-create" style="height: 500px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button id="bt_case_save" class="btn btn-primary" data-dismiss="modal">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="test-case-modify-modal" class="modal fade test-case-modify-modal" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">用例修改</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">用例编号</span>
+                                </div>
+                                <input id="in-id-modify" type="text" class="form-control" readonly unselectable="on"
+                                       aria-describedby="inputGroup-sizing-sm">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">用例名称</span>
+                                </div>
+                                <input id="in-name-modify" type="text" class="form-control"
+                                       aria-describedby="inputGroup-sizing-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">开发组</span>
+                                </div>
+                                <input id="in-team-modify" type="text" class="form-control"
+                                       aria-describedby="inputGroup-sizing-sm">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group input-group-sm mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-sm">服务名称</span>
+                                </div>
+                                <input id="in-service-modify" type="text" class="form-control"
+                                       aria-describedby="inputGroup-sizing-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <label for="jsoneditor-modify" class="col-form-label">用例内容:</label>
+                    <div id="jsoneditor-modify" style="height: 500px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button_modify" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button id="bt_case_save_modify" class="btn btn-primary" data-dismiss="modal">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="test-case-look-modal" class="modal fade test-case-modify-modal" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">用例详情</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="in-name-look" class="col-form-label">用例名称:</label>
+                    <input id="in-name-look" type="text" class="form-control" placeholder="Example input">
+                    <label for="in-team-look" class="col-form-label">开发组:</label>
+                    <input id="in-team-look" type="text" class="form-control" placeholder="Example input">
+                    <label for="in-service-look" class="col-form-label">服务名称:</label>
+                    <input id="in-service-look" type="text" class="form-control" placeholder="Example input">
+                    <label for="jsoneditor-look" class="col-form-label">用例内容:</label>
+                    <div id="jsoneditor-look" style="height: 500px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button_look" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <table id="tb_cases"></table>
+
+    <script>
+        $table = $('#tb_cases')
+
+        {#function getIdSelections() {#}
+        {#    return $.map($table.bootstrapTable('getSelections'), function (row) {#}
+        {#        console.log(row)#}
+        {#        return row.id#}
+        {#    })#}
+        {# } #}
+
+        /* window.operateEvents = {
+            'click .like': function (e, value, row, index) {
+                alert('You click like action, row: ' + JSON.stringify(row))
+            },
+            'click .remove': function (e, value, row, index) {
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: [row.id]
+                })
+            }
+        } */
+
+
+        function operateFormatter(value, row, index) {
+            return [
+                '<a href="javascript:void(0)" title="查看" onclick="getTestCase(' + row.id + ')">',
+                '<i id="test-case-eye" class="fas fa-eye"></i>',
+                '</a>&nbsp;&nbsp;',
+                '<a href="javascript:void(0)" title="编辑" onclick="getTestCase(' + row.id + ')">',
+                '<i id="test-case-edit" class="fas fa-edit"></i>',
+                '</a>&nbsp;&nbsp;',
+                '<a href="javascript:void(0)" title="删除" onclick="deleteTestCase(' + row.id + ')">',
+                '<i id="test-case-trash" class="fas fa-trash"></i>',
+                '</a>'
+            ].join('')
+        }
+
+        {#$("#input-700").fileinput({#}
+        {#    uploadUrl: "/case/har/upload", // 服务器端上传处理程序#}
+        {#    uploadAsync: true,  //异步上传#}
+        {#    maxFileCount: 5,     //最大上传文件数为5#}
+        {#    allowedFileExtensions: ['har']#}
+        {# }); #}
+
+        function initTable() {
+            $table.bootstrapTable({
+                url: '/case/cases',         //请求后台的URL（*）
+                method: 'get',                      //请求方式（*）
+                toolbar: '#toolbar',                //工具按钮用哪个容器
+                striped: true,                      //是否显示行间隔色
+                cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+                pagination: true,                   //是否显示分页（*）
+                sortable: false,                     //是否启用排序
+                sortOrder: "asc",                   //排序方式
+                {#queryParams: oTableInit.queryParams,//传递参数（*）#}
+                sidePagination: "client",           //分页方式：client客户端分页，server服务端分页（*）
+                pageNumber: 1,                       //初始化加载第一页，默认第一页
+                pageSize: 10,                       //每页的记录行数（*）
+                pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
+                search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+                strictSearch: true,
+                showColumns: true,                  //是否显示所有的列
+                showRefresh: true,                  //是否显示刷新按钮
+                {#minimumCountColumns: 2,             //最少允许的列数#}
+                {#clickToSelect: true,                //是否启用点击选中行#}
+                {#height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度#}
+                {#uniqueId: "ID",                     //每一行的唯一标识，一般为主键列#}
+                showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+                cardView: false,                    //是否显示详细视图
+                detailView: false,                   //是否显示父子表
+                columns: [
+                    {# { #}
+                    {#    checkbox: true#}
+                    {# },#}
+                    {
+                        field: 'id',
+                        title: 'id'
+                    }, {
+                        field: 'name',
+                        title: '任务名称',
+                        formatter: function (value, row, index) {
+                            if (row.status.toLowerCase() == 'activated') {
+                                var e = '<span>' + value + ' <span class="badge badge-pill badge-success">正常</span></span>'
+                            } else {
+                                var e = '<span>' + value + ' <span class="badge badge-pill badge-secondary">异常</span></span>'
+                            }
+                            return e
+                        }
+                    }, {
+                        field: 'team',
+                        title: '开发团队'
+                    }, {
+                        field: 'service',
+                        title: '所属服务'
+                    },
+                    {# { #}
+                    {#    field: 'case_json',#}
+                    {#    title: '用例详情'#}
+                    {# }, #}
+                    {
+                        field: 'operate',
+                        title: '操作',
+                        formatter: operateFormatter
+                    }]
+            })
+            /* $table.on('check.bs.table uncheck.bs.table ' +
+                'check-all.bs.table uncheck-all.bs.table',
+                function () {
+                    $bt_remove.prop('disabled', !$table.bootstrapTable('getSelections').length)
+                    selections = getIdSelections()
+                })
+            $table.on('all.bs.table', function (e, name, args) {
+                console.log(name, args)
+            })
+            $bt_refresh_task.click(function () {
+                refresh_jobs()
+            }) */
+        }
+
+
+        // create the editor
+        const containerCreate = document.getElementById('jsoneditor-create')
+        const containerModify = document.getElementById('jsoneditor-modify')
+        const containerLook = document.getElementById('jsoneditor-look')
+        const options = {
+            modes: ['text', 'code', 'tree', 'form', 'view'],
+            mode: 'code',
+            ace: ace
+        }
+        const json = {
+            "config": {
+                "name": "用例集描述",
+                "variables": {}
+            },
+            "teststeps": [{
+                "name": "查询示例",
+                "request": {
+                    "url": "http://127.0.0.1:5000/case/example",
+                    "method": "GET",
+                    "headers": {
+                        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36"
+                    }
+                },
+                "validate": [{
+                    "eq": [
+                        "status_code",
+                        200
+                    ]
+                },
+                    {
+                        "eq": [
+                            "headers.Content-Type",
+                            "application/json"
+                        ]
+                    },
+                    {
+                        "eq": [
+                            "content.returncode",
+                            200
+                        ]
+                    }
+                ]
+            }]
+        }
+        const editorCreate = new JSONEditor(containerCreate, options, json)
+        const editorModify = new JSONEditor(containerModify, options)
+        const editorLook = new JSONEditor(containerLook, options)
+
+        // 保存测试用例
+        $('#bt_case_save').click(
+            function () {
+                var testCase = {
+                    "name": $('#in-name-create').val(),
+                    "team": $('#in-team-create').val(),
+                    "service": $('#in-service-create').val(),
+                    "case_json": editorCreate.get()
+                }
+                createTestCase(testCase)
+            }
+        )
+
+        // 更新测试用例
+        $('#bt_case_save_modify').click(
+            function () {
+                var testCase = {
+                    "id": $('#in-id-modify').val(),
+                    "name": $('#in-name-modify').val(),
+                    "team": $('#in-team-modify').val(),
+                    "service": $('#in-service-modify').val(),
+                    "case_json": editorModify.get()
+                }
+                modifyTestCase(testCase)
+            }
+        )
+
+
+        // 创建用例
+        function createTestCase(testCase) {
+            $.ajax({
+                url: '/case/cases',
+                type: 'post',
+                contentType: "application/json",
+                data: JSON.stringify(testCase),
+                dataType: 'JSON',
+                success: function () {
+                    $table.bootstrapTable('refresh')
+                },
+                error: function () {
+                    alert('请求失败')
+                }
+            })
+        }
+
+        // 修改用例
+        function modifyTestCase(testCase) {
+            $.ajax({
+                url: '/case/case/' + testCase.id,
+                type: 'put',
+                contentType: "application/json",
+                data: JSON.stringify(testCase),
+                dataType: 'JSON',
+                success: function () {
+                    $table.bootstrapTable('refresh')
+                },
+                error: function () {
+                    alert('请求失败')
+                }
+            })
+        }
+
+        // 删除用例
+        function deleteTestCase(id) {
+            $.ajax({
+                url: '/case/case/' + id,
+                type: 'delete',
+                dataType: 'JSON',
+                success: function () {
+                    $table.bootstrapTable('refresh')
+                },
+                error: function () {
+                    alert('请求失败')
+                }
+            })
+        }
+
+        // 请求用例
+        function getTestCase(testCaseId) {
+            var e = window.event.srcElement || window.event.target
+            $.ajax({
+                url: '/case/case/' + testCaseId,
+                type: 'get',
+                dataType: 'JSON',
+                success: function (data) {
+                    showTestCase(data, e)
+                },
+                error: function () {
+                    alert('请求失败')
+                }
+            })
+        }
+
+        // 展示详情与修改窗口
+        function showTestCase(data, e) {
+            if (e.id == 'test-case-eye') {
+                $('#in-name-look').val(data.name)
+                $('#in-team-look').val(data.team)
+                $('#in-service-look').val(data.service)
+                editorLook.set(data.case_json)
+                $('#test-case-look-modal').modal('show')
+            } else if (e.id == 'test-case-edit') {
+                $('#in-id-modify').val(data.id)
+                $('#in-name-modify').val(data.name)
+                $('#in-team-modify').val(data.team)
+                $('#in-service-modify').val(data.service)
+                editorModify.set(data.case_json)
+                $('#test-case-modify-modal').modal('show')
+            }
+        }
+
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+
+        $(function () {
+            initTable()
+            $('#locale').change(initTable)
+        })
+    </script>
+{% endblock %}
