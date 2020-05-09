@@ -44,8 +44,8 @@ IGNORE_REQUEST_HEADERS = [
 
 class MyHarParser(object):
 
-    def __init__(self, har_file_path, filter_str=None, exclude_str=None):
-        self.har_file_path = har_file_path
+    def __init__(self, har_file_json, filter_str=None, exclude_str=None):
+        self.har_file_json = har_file_json
         self.filter_str = filter_str
         self.exclude_str = exclude_str or ""
 
@@ -331,7 +331,7 @@ class MyHarParser(object):
             return False
 
         teststeps = []
-        log_entries = utils.load_har_log_entries(self.har_file_path)
+        log_entries = self.har_file_json["log"]["entries"]
         for entry_json in log_entries:
             url = entry_json["request"].get("url")
             if self.filter_str and self.filter_str not in url:
@@ -361,18 +361,14 @@ class MyHarParser(object):
         return testcase
 
     def gen_testcase(self, file_type="JSON"):
-        logger.info(f"Start to generate testcase from {self.har_file_path}")
-        harfile = os.path.splitext(self.har_file_path)[0]
-        output_testcase_file = "{}.{}".format(harfile, file_type.lower())
 
         testcase = self._make_testcase()
-        # logger.debug("prepared testcase: {}".format(testcase))
+        logger.debug("prepared testcase: {}".format(testcase))
 
         if file_type == "JSON":
-            print(testcase)
+            return testcase
             # utils.dump_json(testcase, output_testcase_file)
         else:
             pass
             # utils.dump_yaml(testcase, output_testcase_file)
 
-        # logger.info(f"generated testcase: {output_testcase_file}")

@@ -17,15 +17,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
-{#                    <input id="input-700" name="kartik-input-700" type="file" multiple class="file-loading" data-show-preview="false">#}
                     <label for="in-name-create" class="col-form-label">用例名称:</label>
                     <input id="in-name-create" type="text" class="form-control" placeholder="请输入用例名称，如：查询全部用例">
                     <label for="in-team-create" class="col-form-label">开发组:</label>
                     <input id="in-team-create" type="text" class="form-control" placeholder="请输入开发组，如：测试组">
                     <label for="in-service-create" class="col-form-label">服务名称:</label>
                     <input id="in-service-create" type="text" class="form-control" placeholder="请输入所属微服务，如：test-stars">
-                    <label for="jsoneditor-create" class="col-form-label">用例内容:</label>
-
+                    <label for="jsoneditor-create" class="col-form-label">用例内容(可通过har文件上传解析):</label>
+                    <div>
+                        <input id="input-001" name="kartik-input-700" type="file" multiple class="file-loading"
+                               data-show-preview="false">
+                    </div>
                     <div id="jsoneditor-create" style="height: 500px;"></div>
                 </div>
                 <div class="modal-footer">
@@ -87,7 +89,11 @@
                             </div>
                         </div>
                     </div>
-                    <label for="jsoneditor-modify" class="col-form-label">用例内容:</label>
+                    <label for="jsoneditor-modify" class="col-form-label">用例内容(可通过har文件上传解析):</label>
+                    <div>
+                        <input id="input-002" name="kartik-input-700" type="file" multiple class="file-loading"
+                               data-show-preview="false">
+                    </div>
                     <div id="jsoneditor-modify" style="height: 500px;"></div>
                 </div>
                 <div class="modal-footer">
@@ -164,12 +170,26 @@
             ].join('')
         }
 
-        {#$("#input-700").fileinput({#}
-        {#    uploadUrl: "/case/har/upload", // 服务器端上传处理程序#}
-        {#    uploadAsync: true,  //异步上传#}
-        {#    maxFileCount: 5,     //最大上传文件数为5#}
-        {#    allowedFileExtensions: ['har']#}
-        {# }); #}
+        $("#input-001").fileinput({
+            language: 'zh', //设置语言
+            uploadUrl: "/case/har/upload", // 服务器端上传处理程序
+            uploadAsync: true,  //异步上传
+            maxFileCount: 1,     //最大上传文件数为5
+            allowedFileExtensions: ['har']
+        });
+        $("#input-001").on("fileuploaded", function (event, data, previewId, index) {
+            editorCreate.set(data.response)
+        })
+        $("#input-002").fileinput({
+            language: 'zh', //设置语言
+            uploadUrl: "/case/har/upload", // 服务器端上传处理程序
+            uploadAsync: true,  //异步上传
+            maxFileCount: 1,     //最大上传文件数为5
+            allowedFileExtensions: ['har']
+        });
+        $("#input-002").on("fileuploaded", function (event, data, previewId, index) {
+            editorModify.set(data.response)
+        })
 
         function initTable() {
             $table.bootstrapTable({

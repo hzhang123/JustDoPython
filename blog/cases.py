@@ -10,6 +10,7 @@
 import json
 import os
 import shutil
+import time
 
 from dingtalkchatbot.chatbot import DingtalkChatbot
 from flask import Blueprint, render_template, jsonify, request
@@ -18,10 +19,10 @@ from httprunner.api import HttpRunner
 
 from blog import db, root_dir, scheduler_fude, scheduler
 from blog.models import TestCases
+from my_har_parser import MyHarParser
 
 cases_blueprint = Blueprint('cases', __name__)
 cases_api = Api(cases_blueprint)
-
 
 parser = reqparse.RequestParser()
 parser.add_argument(
@@ -53,7 +54,21 @@ def har_upload():
     file = request.files['kartik-input-700']
     file_content = file.read().decode('utf-8')
     # file.save(root_dir + 'blog/tests/' + file.filename)
-    return jsonify({'code': 200})
+    test_case = MyHarParser(json.loads(file_content)).gen_testcase("JSON")
+    return jsonify(test_case)
+
+
+@cases_blueprint.route('/test', methods=['POST'])
+def case_test():
+    # runner = HttpRunner
+    case_content = request.json['case']
+    case_debug_file = f'{root_dir}blog/tests/debug/{int(time.time())}_debug.json'
+    with open(case_debug_file, 'w') as f:
+        json.dump(case_content, f)
+    runner = HttpRunner(failfast=True, save_tests=False)
+    summary = runner.run(case_debug_file)
+    print(summary)
+    return jsonify({"code": 200})
 
 
 class ITestCase(Resource):
@@ -181,7 +196,7 @@ def _manage_test_case_file():
     shutil.rmtree(test_case_root_dir)
     os.mkdir(test_case_root_dir)
     for test_case in test_cases:
-        test_case_file = test_case_root_dir + 'case_' + str(test_case.id) + '.json'
+        test_case_file = test_case_root_dir + str(test_case.id) + '_case.json'
         with open(test_case_file, 'w') as f:
             json.dump(test_case.to_json()['case_json'], f)
 
@@ -190,7 +205,6 @@ def _manage_test_case_file():
 
 
 def _manage_test_case():
-
     test_case_root_dir = root_dir + 'blog/tests/testcase/'
     runner = HttpRunner(failfast=True, save_tests=True)
     summary = runner.run(test_case_root_dir)
@@ -229,4 +243,3 @@ def send_to_dingding_marketdown(title, text):
 # 第一次启动刷新一遍用例
 _manage_test_case_file()
 scheduler_fude.add_job(_manage_test_case_file, 'interval', hours=1)
-
