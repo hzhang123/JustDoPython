@@ -10,17 +10,9 @@
 
 from httprunner.api import HttpRunner
 
-from cases import CaseStatus
-
-
-def job_1():
-    pass
-
 
 if __name__ == '__main__':
-    # runner = HttpRunner(failfast=True, save_tests=True)
-    # case_debug_dir = root_dir + 'blog/tests/debug/'
+    runner = HttpRunner(failfast=True, save_tests=False)
 
-    # summary = runner.run("/Users/growingio/PycharmProjects/JustDoPython/blog/tests/debug/")
-    # print(summary)
-    print(CaseStatus.CREATED)
+    summary = runner.run("/Users/growingio/PycharmProjects/JustDoPython/blog/tests/testcase/")
+    print(summary)
