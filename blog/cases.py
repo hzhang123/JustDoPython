@@ -107,6 +107,7 @@ class ITestCase(Resource):
                 TestCases.team: args['team'],
                 TestCases.service: args['service'],
                 TestCases.case_json: args['case_json'],
+                TestCases.status: CaseStatus.CREATED.value,
                 TestCases.updated_at: datetime.datetime.now()
             }
         )
