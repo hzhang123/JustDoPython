@@ -7,13 +7,10 @@
 @CreateTime     :  2020/4/27 13:18
 ------------------------------------
 """
-import json
-import os
 
-from dingtalkchatbot.chatbot import DingtalkChatbot
 from httprunner.api import HttpRunner
 
-from blog import root_dir
+from cases import CaseStatus
 
 
 def job_1():
@@ -21,8 +18,9 @@ def job_1():
 
 
 if __name__ == '__main__':
-    runner = HttpRunner(failfast=True, save_tests=True)
+    # runner = HttpRunner(failfast=True, save_tests=True)
     # case_debug_dir = root_dir + 'blog/tests/debug/'
 
-    summary = runner.run("/Users/growingio/PycharmProjects/JustDoPython/blog/tests/debug/")
-    print(summary)
+    # summary = runner.run("/Users/growingio/PycharmProjects/JustDoPython/blog/tests/debug/")
+    # print(summary)
+    print(CaseStatus.CREATED)

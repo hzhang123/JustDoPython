@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     about_me = db.Column(db.String(140))
-    last_see = db.Column(db.DateTime, default=datetime.utcnow)
+    last_see = db.Column(db.DateTime, default=datetime.now)
     # posts = db.relationship('Post', backref='author', lazy='dynamic')
 
     def __repr__(self):
@@ -46,7 +46,7 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.now)
     user_id = db.Column(db.Integer)
 
     def __repr__(self):
@@ -67,8 +67,8 @@ class SchedulerHttpTask(db.Model):
     assertion = db.Column(db.TEXT)
     expected = db.Column(db.TEXT)
     status = db.Column(db.String(128))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     def to_json(self):
         fields = self.__dict__
@@ -82,21 +82,40 @@ class TestCases(db.Model):
     __table_args__ = {'extend_existing': True}
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(128))
-    team = db.Column(db.String(128))
-    service = db.Column(db.String(128))
-    trigger = db.Column(db.JSON)
-    case_json = db.Column(db.JSON)
-    status = db.Column(db.String(128))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    # 用例名称
+    name = db.Column(db.String(128), comment='用例名称')
+    team = db.Column(db.String(128), comment='开发团队')
+    service = db.Column(db.String(128), comment='所属微服务')
+    trigger = db.Column(db.JSON, comment='时间触发器')
+    case_json = db.Column(db.JSON, comment='用例内容')
+    status = db.Column(db.String(128), comment='用例状态')
+    cteated_id = db.Column(db.Integer, comment='创建者id')
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_id = db.Column(db.Integer, comment='更新者id')
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.now)
+
+    def to_json(self):
+        fields = self.__dict__
+        # if "_sa_instance_state" in fields:
+        #     del fields["_sa_instance_state"]
+        return fields
+
+
+class TestCasesFailedHistory(db.Model):
+    __tablename__ = 'test_cases_failed_history'
+    __table_args__ = {'extend_existing': True}
+
+    id = db.Column(db.Integer, primary_key=True)
+    # 用例名称
+    test_case_id = db.Column(db.Integer, comment='test_cases用例id')
+    test_case_json = db.Column(db.JSON, comment='执行时用例内容')
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
     def to_json(self):
         fields = self.__dict__
         if "_sa_instance_state" in fields:
             del fields["_sa_instance_state"]
         return fields
-
 
 #
 # class Host(db.Model):

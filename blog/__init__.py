@@ -7,8 +7,10 @@
 @CreateTime     :  2020/3/20 11:25
 ------------------------------------
 """
+import logging
 import os
 
+from pyhocon import ConfigFactory
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 # 导入配置文件
@@ -19,12 +21,13 @@ from flask_sqlalchemy import SQLAlchemy
 
 from config import Config
 
-root_dir = os.path.abspath(os.path.dirname(__file__)).split('JustDoPython')[0] + 'JustDoPython/'
-
 # app初始化
 app = Flask(__name__)
 # 配置配置文件
 app.config.from_object(Config)
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # 数据库初始化，建立数据库关系
 db = SQLAlchemy(app)

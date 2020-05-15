@@ -7,19 +7,22 @@
 @CreateTime     :  2020/4/30 19:53
 ------------------------------------
 """
+import datetime
 import json
 import os
-import shutil
 import time
+from enum import unique, Enum
 
 from dingtalkchatbot.chatbot import DingtalkChatbot
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, current_app
 from flask_restful import Api, Resource, reqparse, fields, marshal, marshal_with
 from httprunner.api import HttpRunner
+from sqlalchemy import func
 
-from blog import db, root_dir, scheduler_fude, scheduler
-from blog.models import TestCases
-from my_har_parser import MyHarParser
+from blog import db, scheduler_fude, logger, app
+from blog.models import TestCases, TestCasesFailedHistory
+from blog.my_har_parser import MyHarParser
+from config import root_dir, cfg
 
 cases_blueprint = Blueprint('cases', __name__)
 cases_api = Api(cases_blueprint)
@@ -88,7 +91,7 @@ class ITestCase(Resource):
             TestCases.id == case_id
         ).update(
             {
-                TestCases.status: 'deleted'
+                TestCases.status: CaseStatus.DELETED.value
             }
         )
         db.session.commit()
@@ -118,7 +121,10 @@ class ITestCases(Resource):
         # limit = info.get('limit', 10)  # 每页显示的条数
         # offset = info.get('offset', 0)  # 分片数，(页码-1)*limit，它表示一段数据的起点
         test_cases = db.session.query(TestCases).filter(
-            TestCases.status.in_(['activated', 'draft'])
+            TestCases.status.in_([CaseStatus.CREATED.value,
+                                  CaseStatus.RUNNING.value,
+                                  CaseStatus.SUSPENDED.value,
+                                  CaseStatus.FAILED.value])
         ).order_by(
             TestCases.id.asc()
         ).all()
@@ -138,7 +144,7 @@ class ITestCases(Resource):
             case_json=args['case_json']
         )
         st.trigger = {'type': 'interval', 'unit': 'minutes', 'size': '2'}
-        st.status = 'activated'
+        st.status = CaseStatus.CREATED.value
         db.session.add(st)
         db.session.commit()
         return jsonify({'code': 200, 'msg': '用例添加成功'})
@@ -189,57 +195,232 @@ def example():
     return jsonify(data)
 
 
-# 引入定时任务管理
-def _manage_test_case_file():
-    test_cases = db.session.query(TestCases).filter(TestCases.status == 'activated').all()
-    test_case_root_dir = root_dir + 'blog/tests/testcase/'
-    shutil.rmtree(test_case_root_dir)
-    os.mkdir(test_case_root_dir)
-    for test_case in test_cases:
-        test_case_file = test_case_root_dir + str(test_case.id) + '_case.json'
-        with open(test_case_file, 'w') as f:
-            json.dump(test_case.to_json()['case_json'], f)
-
-    scheduler.remove_all_jobs()
-    scheduler.add_job(_manage_test_case, 'interval', seconds=60)
-
-
-def _manage_test_case():
-    test_case_root_dir = root_dir + 'blog/tests/testcase/'
-    runner = HttpRunner(failfast=True, save_tests=True)
-    summary = runner.run(test_case_root_dir)
-    # 用例集失败
-    if summary['success'] is False:
-        for detail in summary['details']:
-            # 用例失败
-            if detail['success'] is False:
-                for record in detail['records']:
-                    test_case_name = record['name']
-                    test_case_status = record['status']
-                    test_case_attachment = record['attachment']
-                    test_case_meta_datas = record['meta_datas']
-                    print('result' + str(test_case_name) + str(test_case_status) + str(test_case_attachment) + str(
-                        test_case_meta_datas))
-                    text = f'''
-                    ## 用例状态
-
-                    {test_case_status}
-
-                    ## 用例详情
-
-                    ```
-                    {json.dumps(test_case_meta_datas, indent=2)}
-                    ```
-                    '''
-                    send_to_dingding_marketdown(title=f'API{test_case_name}', text=text)
+@unique
+class CaseStatus(Enum):
+    """
+    定时任务与用例状态
+    """
+    # 新创建状态
+    CREATED = 'created'
+    # 运行状态
+    RUNNING = 'running'
+    # 失败状态
+    FAILED = 'failed'
+    # 暂停状态
+    SUSPENDED = 'suspended'
+    # 删除状态
+    DELETED = 'deleted'
+    # 空值
+    NULL = None
 
 
-def send_to_dingding_marketdown(title, text):
-    webhook = 'https://oapi.dingtalk.com/robot/send?access_token=bbcb656e68a3999a81e492c79eac4bd629dd90478640d34034788124ca7537dc'
-    xiaoding = DingtalkChatbot(webhook)
-    xiaoding.send_markdown(title=title, text=text)
+class CaseStatusManage:
+    """
+    管理测试用例状态
+    """
+
+    def to_running(self, case_id):
+        self.update_status(case_id, CaseStatus.RUNNING.value)
+
+    def to_failed(self, case_id):
+        self.update_status(case_id, CaseStatus.FAILED.value)
+
+    def to_suspended(self, case_id):
+        self.update_status(case_id, CaseStatus.SUSPENDED.value)
+
+    def to_deleted(self, case_id):
+        self.update_status(case_id, CaseStatus.DELETED.value)
+
+    def update_status(self, case_id, case_status):
+        update_case = db.session.query(TestCases).filter(
+            TestCases.id == case_id
+        ).update(
+            {
+                TestCases.status: case_status
+            }
+        )
+        db.session.commit()
 
 
-# 第一次启动刷新一遍用例
-_manage_test_case_file()
-scheduler_fude.add_job(_manage_test_case_file, 'interval', hours=1)
+class BackGroundJob(object):
+
+    @classmethod
+    def testcase_1m_job(cls):
+        # 执行测试用例
+        cls._manage_test_case()
+
+    @classmethod
+    def testcase_5m_job(cls):
+
+        # 刷新用例文件
+        cls._refresh_test_case_file()
+        # 失败用例发送钉钉
+        cls._send_report_to_dingding()
+
+    @classmethod
+    def testcase_10m_job(cls):
+        # 刷新用例状态
+        cls._refresh_test_case_status()
+
+    @classmethod
+    def _interval(cls, seconds):
+        """
+        指定间隔之前
+        :param seconds:
+        :return:
+        """
+        return datetime.datetime.now() - datetime.timedelta(seconds=seconds)
+
+    @classmethod
+    def _send_report_to_dingding(cls):
+        """
+        失败用例report发送钉钉
+        :return:
+        """
+        xiaoding = DingtalkChatbot(cfg.dingding.report)
+        failed_test_cases = db.session.query(
+            TestCases.id, TestCases.name
+        ).filter(
+            TestCases.status == CaseStatus.FAILED.value
+        ).all()
+        if len(failed_test_cases) > 0:
+            msg = 'MyAPI失败用例列表：'
+            for test_case in failed_test_cases:
+                msg += f'\t用例id: {test_case[0]}, 用例名称: {test_case[1]}\n'
+            xiaoding.send_text(msg=msg)
+
+    @classmethod
+    def _refresh_test_case_status(cls):
+        """
+        失败率超过30%，标记为失败
+        :return:
+        """
+        cnt = func.count(1).label('cnt')
+        failed_test_case_list = db.session.query(
+            TestCasesFailedHistory.test_case_id,
+            cnt
+        ).filter(
+            TestCasesFailedHistory.created_at > cls._interval(600)
+        ).group_by(
+            TestCasesFailedHistory.test_case_id
+        ).having(
+            cnt > 3
+        ).all()
+
+        for failed_test_case in failed_test_case_list:
+            CaseStatusManage().to_failed(failed_test_case[0])
+
+
+    @classmethod
+    def _refresh_test_case_file(cls):
+        """
+        新创建 与 正在运行的: 存在不动,
+        新创建状态 -> 运行
+        错误用例 -> 错误并停止
+        :return:
+        """
+        test_case_root_dir = root_dir + '/blog/tests/testcase/'
+        if not os.path.exists(test_case_root_dir):
+            os.mkdir(test_case_root_dir)
+        # 用例不是太多的情况下全部查出来
+        # created running
+        created_running_cases = db.session.query(TestCases).filter(
+            TestCases.status.in_([CaseStatus.CREATED.value,
+                                  CaseStatus.RUNNING.value])
+        ).order_by(
+            TestCases.id.asc()
+        ).all()
+        created_running_case_ids = [test_case.id for test_case in created_running_cases]
+
+        # 所有已存在文件
+        test_case_files = os.listdir(test_case_root_dir)
+        test_case_files_map = {int(test_case_file.split('_')[0]): test_case_file for test_case_file in test_case_files}
+
+        # 非上线用例删除
+        for cur_case_id in test_case_files_map.keys():
+            if cur_case_id not in created_running_case_ids:
+                os.remove(test_case_root_dir + test_case_files_map[cur_case_id])
+        # 不存在用例：创建
+        # 近期更新：更新
+        # 其它：不操作
+        for test_case in created_running_cases:
+            # 新上线用例创建
+            if test_case.id not in test_case_files_map.keys():
+                test_case_file = test_case_root_dir + str(test_case.id) + '_case.json'
+
+                with open(test_case_file, 'w') as f:
+                    # 标识一下用例与本条执行的关系
+                    case_json = test_case.to_json()['case_json']
+                    case_json['config']['name'] = str(test_case.to_json()['id']) + '_' + case_json['config']['name']
+                    json.dump(case_json, f)
+
+                CaseStatusManage().to_running(test_case.id)
+            # 7min 内更新的重建
+            elif test_case.id in test_case_files_map.keys() and test_case.updated_at > cls._interval(420):
+                os.remove(test_case_root_dir + test_case_files_map[test_case.id])
+                test_case_file = test_case_root_dir + str(test_case.id) + '_case.json'
+                with open(test_case_file, 'w') as f:
+                    # 标识一下用例与本条执行的关系
+                    case_json = test_case.to_json()['case_json']
+                    case_json['config']['name'] = str(test_case.to_json()['id']) + '_' + case_json['config']['name']
+                    json.dump(case_json, f)
+                CaseStatusManage().to_running(test_case.id)
+
+
+    @classmethod
+    def _manage_test_case(cls):
+        """
+        执行测试用例
+        :return:
+        """
+        test_case_root_dir = root_dir + '/blog/tests/testcase/'
+        if not os.listdir(test_case_root_dir):
+            return
+        runner = HttpRunner(failfast=True, save_tests=False)
+        summary = runner.run(test_case_root_dir)
+        # 用例集失败
+        if summary['success'] is False:
+            for detail in summary['details']:
+                # 用例失败
+                if detail['success'] is False:
+                    cls._to_failed_recode(detail)
+                    # for record in detail['records']:
+                    #     test_case_name = record['name']
+                    #     test_case_status = record['status']
+                    #     test_case_attachment = record['attachment']
+                    #     test_case_meta_datas = record['meta_datas']
+                    #     text = f'''
+                    #     ## 用例状态
+                    #
+                    #     {test_case_status}
+                    #
+                    #     ## 用例详情
+                    #
+                    #     ```
+                    #     {json.dumps(test_case_meta_datas, indent=2)}
+                    #     ```
+                    #     '''
+
+    @classmethod
+    def _to_failed_recode(cls, detail):
+        """
+        记录失败的测试用例到数据库
+        :param detail:
+        :return:
+        """
+        failed_test_case_id = int(detail['name'].split('_')[0])
+
+        test_cases_json = db.session.query(TestCases.case_json).filter(
+            TestCases.id == failed_test_case_id
+        ).first()
+        test_case_fh = TestCasesFailedHistory(
+            test_case_id=failed_test_case_id,
+            test_case_json=test_cases_json
+        )
+        db.session.add(test_case_fh)
+        db.session.commit()
+
+
+scheduler_fude.add_job(BackGroundJob.testcase_1m_job, 'interval', minutes=1)
+scheduler_fude.add_job(BackGroundJob.testcase_5m_job, 'interval', minutes=5)
+scheduler_fude.add_job(BackGroundJob.testcase_10m_job, 'interval', minutes=10)

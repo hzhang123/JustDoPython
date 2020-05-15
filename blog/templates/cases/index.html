@@ -228,10 +228,22 @@
                         field: 'name',
                         title: '任务名称',
                         formatter: function (value, row, index) {
-                            if (row.status.toLowerCase() == 'activated') {
-                                var e = '<span>' + value + ' <span class="badge badge-pill badge-success">正常</span></span>'
-                            } else {
-                                var e = '<span>' + value + ' <span class="badge badge-pill badge-secondary">异常</span></span>'
+                            switch (row.status.toLowerCase()) {
+                                case "created":
+                                    var e = '<span>' + value + ' <span class="badge badge-pill badge-info">草稿</span></span>'
+                                    break;
+                                case "running":
+                                    var e = '<span>' + value + ' <span class="badge badge-pill badge-success">运行中</span></span>'
+                                    break;
+                                case "failed":
+                                    var e = '<span>' + value + ' <span class="badge badge-pill badge-danger">错误</span></span>'
+                                    break;
+                                case "suspended":
+                                    var e = '<span>' + value + ' <span class="badge badge-pill badge-secondary">暂停</span></span>'
+                                    break;
+                                default:
+                                    var e = '<span>' + value + ' <span class="badge badge-pill badge-warning">异常</span></span>'
+                                    break;
                             }
                             return e
                         }

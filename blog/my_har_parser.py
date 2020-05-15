@@ -10,13 +10,11 @@
 
 import base64
 import json
-import os
 import sys
 import urllib.parse as urlparse
 
-from loguru import logger
-
 from httprunner.ext.har2case import utils
+from loguru import logger
 
 try:
     from json.decoder import JSONDecodeError
