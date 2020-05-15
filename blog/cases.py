@@ -106,7 +106,8 @@ class ITestCase(Resource):
                 TestCases.name: args['name'],
                 TestCases.team: args['team'],
                 TestCases.service: args['service'],
-                TestCases.case_json: args['case_json']
+                TestCases.case_json: args['case_json'],
+                TestCases.updated_at: datetime.datetime.now()
             }
         )
         db.session.commit()
