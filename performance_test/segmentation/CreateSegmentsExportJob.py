@@ -9,6 +9,8 @@
 """
 import time
 
+import pandas as pd
+
 from segmentation_pb2 import *
 from segmentation_pb2_grpc import *
 
@@ -29,25 +31,26 @@ def create_segment_export_job(host_ip, project_id, id):
             time.sleep(0.5)
         i += 1
         state = response.status
+        print(response.status)
     print(response.status)
     print(time.time() - start_time, state)
     return time.time() - start_time, state
 
 
 if __name__ == '__main__':
-    # df = pd.read_csv('user_segmentations.csv')
-    # usv_time = []
-    # uv_time = []
-    # for row in df.loc[0:1, ['id', 'name', 'type']].values:
-    #     print(row[1], row[2], end=':')
-    #     times, state = create_segment_export_job('*:111', 3, row[0])
-    #     if row[2] == 'usv':
-    #         usv_time.append(times)
-    #     else:
-    #         uv_time.append(times)
-    # create_segment_export_job('*:111', 3, 123)
-    # print(f'usv time:' + str(sum(usv_time) / len(usv_time)))
-    # print(f'uv time:' + str(sum(uv_time) / len(uv_time)))
+    df = pd.read_csv('user_segmentations.csv')
+    usv_time = []
+    uv_time = []
+    for row in df.loc[0:1, ['id', 'name', 'type']].values:
+        print(row[1], row[2], end=':')
+        times, state = create_segment_export_job('*:111', 3, row[0])
+        if row[2] == 'usv':
+            usv_time.append(times)
+        else:
+            uv_time.append(times)
+    create_segment_export_job('*:111', 3, 123)
+    print(f'usv time:' + str(sum(usv_time) / len(usv_time)))
+    print(f'uv time:' + str(sum(uv_time) / len(uv_time)))
 
-    re = create_segment_export_job('10.0.0.156:19225', 109056, 135052)
+    re = create_segment_export_job('10.0.0.156:19225', 3, 151284)
     print(re)

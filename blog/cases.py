@@ -14,12 +14,12 @@ import time
 from enum import unique, Enum
 
 from dingtalkchatbot.chatbot import DingtalkChatbot
-from flask import Blueprint, render_template, jsonify, request, current_app
+from flask import Blueprint, render_template, jsonify, request
 from flask_restful import Api, Resource, reqparse, fields, marshal, marshal_with
 from httprunner.api import HttpRunner
 from sqlalchemy import func
 
-from blog import db, scheduler_fude, logger, app
+from blog import db, scheduler_fude
 from blog.models import TestCases, TestCasesFailedHistory
 from blog.my_har_parser import MyHarParser
 from config import root_dir, cfg
@@ -311,7 +311,6 @@ class BackGroundJob(object):
 
         for failed_test_case in failed_test_case_list:
             CaseStatusManage().to_failed(failed_test_case[0])
-
 
     @classmethod
     def _refresh_test_case_file(cls):

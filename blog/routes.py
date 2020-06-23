@@ -16,6 +16,11 @@ from blog.models import User
 app.register_blueprint(cases_blueprint, url_prefix='/case')
 
 
+@app.route('/mock/<path:subpath>/server/<path:subpath1>')
+def mock_server(subpath, subpath1):
+    return f'first:{subpath}, second:{subpath1}'
+
+
 @app.route('/')
 @app.route('/index')
 @login_required
