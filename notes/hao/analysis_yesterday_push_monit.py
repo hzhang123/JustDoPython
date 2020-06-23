@@ -99,6 +99,8 @@ if __name__ == '__main__':
         ''',
         events_conn
     )
+    growing_conn.close()
+    events_conn.close()
 
     # 数据关联操作
     all_data = pd.merge(
