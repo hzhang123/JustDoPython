@@ -7,6 +7,3 @@
 @CreateTime     :  2020/6/23 13:37
 ------------------------------------
 """
-import os
-
-my_root_dir = os.path.abspath(os.path.dirname(__file__))

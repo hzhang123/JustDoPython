@@ -7,6 +7,7 @@
 @CreateTime     :  2020/6/22 13:56
 ------------------------------------
 """
+import os
 import time
 
 import psycopg2
@@ -15,12 +16,10 @@ import pandas as pd
 from dingtalkchatbot.chatbot import DingtalkChatbot
 from pyhocon import ConfigFactory
 
-from notes import my_root_dir
-
 
 if __name__ == '__main__':
     # 初始化配置文件
-    conf = ConfigFactory.parse_file(f'{my_root_dir}/conf/push-monit.conf')
+    conf = ConfigFactory.parse_file(f'{os.path.abspath(os.path.dirname(__file__))}/../conf/push-monit.conf')
 
     host = conf.zeppelin.host
     # 登录获取cookie
