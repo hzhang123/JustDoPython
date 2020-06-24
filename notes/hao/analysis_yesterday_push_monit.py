@@ -169,5 +169,5 @@ if __name__ == '__main__':
         {message[0]}\t{message[1]}\t今日分群人数:{message[2]}
         消息发送设备数:{message[3]}\t消息送达设备数:{message[4]}\t点击数:{message[5]}\t送达率:{message[6]}\t点击率:{message[7]}
         '''
-    xiaoding = DingtalkChatbot(conf.dingding.webhook)
+    xiaoding = DingtalkChatbot(webhook=conf.dingding.webhook, secret=conf.dingding.secret)
     xiaoding.send_text(context)
