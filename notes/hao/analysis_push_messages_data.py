@@ -18,7 +18,7 @@ import requests
 from dingtalkchatbot.chatbot import DingtalkChatbot
 from pyhocon import ConfigFactory
 
-from notes.hao.tools import dataframe_to_image, upload_image
+import tools
 
 conf = ConfigFactory.parse_file(f'{os.path.abspath(os.path.dirname(__file__))}/../conf/push-monit.conf')
 message_sent = 'gio_push_message_sent'
@@ -175,8 +175,8 @@ result['分群有效率'] = result['分群有效率'].apply(lambda x: format(x, 
 result['送达率'] = result['送达率'].apply(lambda x: format(x, '.2%'))
 result['点击率'] = result['点击率'].apply(lambda x: format(x, '.2%'))
 
-image = dataframe_to_image(result)
-url = upload_image(conf, image)
+image = tools.dataframe_to_image(result)
+url = tools.upload_image(conf, image)
 
 xiaoding = DingtalkChatbot(webhook=conf.dingding.webhook, secret=conf.dingding.secret)
 xiaoding.send_markdown(title='昨日推送\n',

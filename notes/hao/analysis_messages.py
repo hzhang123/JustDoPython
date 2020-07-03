@@ -14,7 +14,7 @@ import psycopg2
 from dingtalkchatbot.chatbot import DingtalkChatbot
 from pyhocon import ConfigFactory
 
-from notes.hao.tools import dataframe_to_image, upload_image
+import tools
 
 conf = ConfigFactory.parse_file(f'{os.path.abspath(os.path.dirname(__file__))}/../conf/push-monit.conf')
 
@@ -140,8 +140,8 @@ result = messages_data.pivot_table('cnt', index='项目名称', columns='任务�
 # 追加总计
 result = result.reset_index().append(result.sum(axis=0).to_dict(), ignore_index=True).fillna('总计').set_index('项目名称')
 
-image = dataframe_to_image(result)
-url = upload_image(conf, image)
+image = tools.dataframe_to_image(result)
+url = tools.upload_image(conf, image)
 
 xiaoding = DingtalkChatbot(webhook=conf.dingding.webhook, secret=conf.dingding.secret)
 xiaoding.send_markdown(title='昨日用户运营使用情况\n', text='#### 数据详情\n\n'
