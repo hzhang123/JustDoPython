@@ -9,12 +9,9 @@
 """
 import os
 
-import imgkit
 import pandas as pd
 import psycopg2
-from IPython import display
 from dingtalkchatbot.chatbot import DingtalkChatbot
-
 from pyhocon import ConfigFactory
 
 from notes.hao.tools import dataframe_to_image, upload_image
