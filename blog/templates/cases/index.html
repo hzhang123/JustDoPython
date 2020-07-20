@@ -1,5 +1,23 @@
 {% extends 'base.html' %}
 
+{% block head %}
+
+    {{ render_static('css', '/node_modules/bootstrap-table/dist/bootstrap-table.min.css', local = True) }}
+    {{ render_static('js', '/node_modules/bootstrap-table/dist/bootstrap-table.min.js', local = True) }}
+    {{ render_static('js', '/node_modules/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js', local = True) }}
+
+    <!-- jsonedit -->
+    {#    {{ render_static('js', '/node_modules/ace-builds/src-min/ace.js', local = True) }}#}
+    {{ render_static('css', '/node_modules/jsoneditor/dist/jsoneditor.min.css', local = True) }}
+    {{ render_static('js', '/node_modules/jsoneditor/dist/jsoneditor.min.js', local = True) }}
+
+    <!-- fileinput -->
+    {{ render_static('js', '/node_modules/bootstrap-fileinput/js/fileinput.min.js', local = True) }}
+    {{ render_static('js', '/node_modules/bootstrap-fileinput/js/locales/zh.js', local = True) }}
+    {{ render_static('css', '/node_modules/bootstrap-fileinput/css/fileinput.min.css', local = True) }}
+
+{% endblock %}
+
 {% block content %}
 
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".test-case-add-modal"><i

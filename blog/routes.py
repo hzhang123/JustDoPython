@@ -16,7 +16,7 @@ from blog.models import User
 from blog.toolbox import boolbox_blueprint
 
 app.register_blueprint(cases_blueprint, url_prefix='/case')
-app.register_blueprint(boolbox_blueprint, url_predix='/toolbox')
+app.register_blueprint(boolbox_blueprint, url_prefix='/toolbox')
 
 
 @app.route('/mock/<path:subpath>/server/<path:subpath1>')
