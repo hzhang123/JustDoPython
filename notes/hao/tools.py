@@ -20,6 +20,7 @@ def dataframe_to_image(data: DataFrame):
     :param data:
     :return:
     """
+
     return imgkit.from_string(data.to_html(classes='pure-table pure-table-horizontal'),
                               False,
                               options={'encoding': 'utf8'},

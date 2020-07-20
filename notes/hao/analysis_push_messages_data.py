@@ -21,6 +21,7 @@ from pyhocon import ConfigFactory
 import tools
 
 conf = ConfigFactory.parse_file(f'{os.path.abspath(os.path.dirname(__file__))}/../conf/push-monit.conf')
+
 message_sent = 'gio_push_message_sent'
 message_arrived = 'gio_push_message_arrived'
 message_clicked = 'gio_push_message_clicked'
@@ -177,9 +178,9 @@ result['点击率'] = result['点击率'].apply(lambda x: format(x, '.2%'))
 
 image = tools.dataframe_to_image(result)
 url = tools.upload_image(conf, image)
-
-xiaoding = DingtalkChatbot(webhook=conf.dingding.webhook, secret=conf.dingding.secret)
-xiaoding.send_markdown(title='昨日推送\n',
-                       text='#### 推送数据详情\n\n'
-                            f'![报告]({url})\n',
-                       is_at_all=False)
+print(url)
+# xiaoding = DingtalkChatbot(webhook=conf.dingding.webhook, secret=conf.dingding.secret)
+# xiaoding.send_markdown(title='昨日推送\n',
+#                        text='#### 推送数据详情\n\n'
+#                             f'![报告]({url})\n',
+#                        is_at_all=False)

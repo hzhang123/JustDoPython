@@ -13,7 +13,10 @@ from blog.models import User
 
 # app.register_blueprint(locust_hive, url_prefix='/locusts')
 # app.register_blueprint(scheduler_task, url_prefix='/scheduler')
+from toolbox import boolbox_blueprint
+
 app.register_blueprint(cases_blueprint, url_prefix='/case')
+app.register_blueprint(boolbox_blueprint, url_predix='/toolbox')
 
 
 @app.route('/mock/<path:subpath>/server/<path:subpath1>')
@@ -25,6 +28,7 @@ def mock_server(subpath, subpath1):
 @app.route('/index')
 @login_required
 def index():
+
     user = {'username': 'zhanghao'}
     posts = [
         {
@@ -117,3 +121,6 @@ def edit_profile():
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='个人资料编辑', form=form)
+
+
+print()
