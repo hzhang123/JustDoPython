@@ -13,7 +13,7 @@ from blog.models import User
 
 # app.register_blueprint(locust_hive, url_prefix='/locusts')
 # app.register_blueprint(scheduler_task, url_prefix='/scheduler')
-from toolbox import boolbox_blueprint
+from blog.toolbox import boolbox_blueprint
 
 app.register_blueprint(cases_blueprint, url_prefix='/case')
 app.register_blueprint(boolbox_blueprint, url_predix='/toolbox')
