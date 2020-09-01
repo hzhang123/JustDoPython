@@ -136,7 +136,7 @@ growing_conn.close()
 
 # 数据透视
 messages_data = messages_data.rename(columns={"project_name": "项目名称", "message_type": "任务类型"})
-result = messages_data.pivot_table('cnt', index='项目名称', columns='任务类型').fillna(0)
+result = messages_data.pivot_table('cnt', index='项目名称', columns='任务类型').fillna(0).sort_values(by='普通弹窗', ascending=0)
 # 追加总计
 result = result.reset_index().append(result.sum(axis=0).to_dict(), ignore_index=True).fillna('总计').set_index('项目名称')
 

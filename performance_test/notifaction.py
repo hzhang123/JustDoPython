@@ -7,23 +7,42 @@
 @CreateTime     :  2020/4/17 14:43
 ------------------------------------
 """
-import uuid
+import os
+import queue
 
-from locust import HttpLocust, TaskSet, task, between
+import pandas
+from locust import between
+from locust import task
+from locust.contrib.fasthttp import FastHttpUser
 
 
-class UserBehaviour(TaskSet):
+class WebsiteUser(FastHttpUser):
+
+    host = 'https://messages-release.growingio.com'
+
+    queueData = queue.Queue()
+    dir = os.path.split(os.path.realpath(__file__))[0]
+    df = pandas.read_csv(f'{dir}/data/visit_id.csv')
+    for u in df.u.values:
+        queueData.put(
+            {"u": u}
+        )
+
+    wait_time = between(0.2, 0.4)
 
     @task(1)
-    def get_userscope_props(self):
-        uc = uuid.uuid1()
-        url = f'/v3/0a1b4118dd954ec3bcc69da5138bdb96/notifications?url_scheme=growing.638b52710867187c&u={uc}&cs={uc}'
-        with self.client.get(url=url, catch_response=True) as r:
-            if r.status_code == 200:
-                r.success()
-            r.connection.close()
+    def get_notifactions(self):
+        try:
+            file_line = self.queueData.get()
+            self.queueData.put_nowait(file_line)
 
-
-class WebsiteUser(HttpLocust):
-    task_set = UserBehaviour
-    wait_time = between(0.2, 0.4)
+            data = dict({
+                "url_scheme": "growing.638b52710867187c",
+            }, **file_line)
+            url = f'/v3/0a1b4118dd954ec3bcc69da5138bdb96/notifications'
+            r = self.client.get(path=url, data=data)
+            print(r.json())
+            assert r.status_code == 200
+        except queue.Empty:
+            print('no data exist')
+            exit(0)
