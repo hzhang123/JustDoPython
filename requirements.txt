@@ -79,7 +79,7 @@ ptyprocess==0.6.0
 pycparser==2.20
 pydantic==1.5.1
 pyecharts==1.7.1
-Pygments==2.6.1
+Pygments==2.7.4
 pyhocon==0.3.54
 pymongo==3.10.1
 PyNaCl==1.3.0
