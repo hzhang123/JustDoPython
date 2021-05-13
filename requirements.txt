@@ -77,7 +77,7 @@ psycopg2==2.8.4
 psycopg2-binary==2.8.5
 ptyprocess==0.6.0
 pycparser==2.20
-pydantic==1.5.1
+pydantic==1.6.2
 pyecharts==1.7.1
 Pygments==2.6.1
 pyhocon==0.3.54
