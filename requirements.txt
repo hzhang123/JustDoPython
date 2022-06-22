@@ -61,7 +61,7 @@ Mako==1.1.2
 MarkupSafe==1.1.1
 matplotlib==3.2.2
 msgpack==1.0.0
-numpy==1.18.3
+numpy==1.22.0
 packaging==16.8
 pandas==1.0.3
 paramiko==2.7.1
