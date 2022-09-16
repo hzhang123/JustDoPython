@@ -57,7 +57,7 @@ locust-plugins==0.0.42
 locust-swarm==0.0.41
 locustio==0.14.5
 loguru==0.4.1
-Mako==1.1.2
+Mako==1.2.2
 MarkupSafe==1.1.1
 matplotlib==3.2.2
 msgpack==1.0.0
