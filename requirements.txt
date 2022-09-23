@@ -70,7 +70,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
 prettytable==0.7.2
 prompt-toolkit==3.0.5
-protobuf==3.11.3
+protobuf==3.18.3
 psutil==5.7.0
 psycogreen==1.0.2
 psycopg2==2.8.4
